@@ -17,11 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +25,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ma.myapp.ui.theme.MyAppTheme
+import com.ma.myapp.viewmodel.CounterViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,8 +49,8 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun RandomButton(modifier: Modifier) {
-    var count by remember { mutableIntStateOf(1) }
+fun RandomButton(modifier: Modifier, counterViewModel: CounterViewModel = viewModel()) {
+    val count = counterViewModel.counter.collectAsStateWithLifecycle()
     Box(
         modifier = modifier
             .fillMaxSize(),
@@ -70,14 +68,14 @@ fun RandomButton(modifier: Modifier) {
                 Box(
                     modifier = Modifier
                         .clickable {
-                            if(count > 0)count--
+                            counterViewModel.decrementCounter()
                         }
                         .weight(1f)
                         .fillMaxHeight()
-                        .background(color = Color.Red),
+                        .background(color = Color(0xFFE0E0E0)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("-", style = TextStyle(fontSize = 28.sp))
+                    Text("-", style = TextStyle(fontSize = 28.sp, color = Color(0xFF333333)))
                 }
 
                 Box(
@@ -87,23 +85,21 @@ fun RandomButton(modifier: Modifier) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "$count", style = TextStyle(fontSize = 28.sp)
+                        "${count.value}", style = TextStyle(fontSize = 28.sp)
                     )
                 }
 
                 Box(
                     modifier = Modifier
-                        .clickable{
-                            if (count < 10){
-                                count++;
-                            }
+                        .clickable {
+                            counterViewModel.incrementCounter()
                         }
                         .weight(1f)
                         .fillMaxHeight()
-                        .background(color = Color.DarkGray),
+                        .background(color = Color(0xFFA8D5BA)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("+", style = TextStyle(fontSize = 28.sp))
+                    Text("+", style = TextStyle(fontSize = 28.sp, color = Color(0xFF333333)))
                 }
             }
         }
